@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from async_task_tracker import GistStorage
 
-
 app = FastAPI()
 storage = GistStorage()
 
