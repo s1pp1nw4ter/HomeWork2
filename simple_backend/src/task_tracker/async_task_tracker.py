@@ -1,10 +1,12 @@
 import json
 import httpx
+from LLM_client import LLMclient
+LLM = LLMclient()
 
 
 class GistStorage:
     def __init__(self, gist_id: str = 'a2f9fc0ede0297205930810916e12432',
-                 token: str = 'Напишите свой',
+                 token: str = '',
                  filename: str = 'tasks.json'):
         self.gist_id = gist_id
         self.token = token
@@ -31,7 +33,8 @@ class GistStorage:
         tasks = await self.fetch()
         new_id = max((task['id'] for task in tasks), default = -1)+1
         new_task = {"id": new_id, "title": title, "status": 0}
-        tasks.append(new_task)
+        explain_task = await LLM.get_expain_task(new_task)
+        tasks.append(explain_task)
         await self.push(tasks)
         return new_task
 
@@ -41,6 +44,7 @@ class GistStorage:
             if task['id'] == task_id:
                 task['title'] = title
                 task['status'] = status
+                task = await LLM.get_expain_task(task)
                 await self.push(tasks)
                 return task
         return None
